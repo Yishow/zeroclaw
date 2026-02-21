@@ -481,3 +481,31 @@ When working in fast iterative mode:
 - Prefer deterministic behavior over clever shortcuts.
 - Do not “ship and hope” on security-sensitive paths.
 - If uncertain, leave a concrete TODO with verification context, not a hidden guess.
+
+## 13) Local Fork Workflow Preference (Repository-Specific Override)
+
+For this local workspace, use a fork-first workflow by default.
+
+- Integration target is `origin/main` (personal fork), not `upstream/main`.
+- Do not open PRs to upstream unless the user explicitly asks for upstream contribution.
+- Keep `upstream` only as sync source and `origin` as publish target.
+- Never develop directly on `main`; create or switch to `feat/*` branch first.
+
+Preferred commands (do not ask user to memorize raw Git steps):
+
+- `git zc start <branch>`: sync base then create/switch feature branch.
+- `git zc sync`: sync current branch with upstream (`main` fast-forward, feature branch rebase).
+- `git zc build`: run:
+  - `cargo build --release --locked`
+  - `cargo install --path . --force --locked`
+- `git zc publish`: push current feature branch to `origin`.
+- `git zc doctor`: verify remotes and working tree state.
+
+If sync completed but build fails, use this default next-step sequence:
+
+1. Re-run `git zc sync`.
+2. Re-run `git zc build`.
+3. Capture and inspect the first `error:` line (ignore warnings for initial triage).
+4. Verify toolchain: `rustc --version` and `cargo --version`.
+5. On macOS linker/toolchain issues, run `xcode-select --install`.
+6. If cache/build artifacts are suspected, run `cargo clean` and retry `git zc build`.
