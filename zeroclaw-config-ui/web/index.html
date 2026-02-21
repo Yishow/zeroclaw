@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZeroClaw 設定介面</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="title-wrap">
+        <h1>ZeroClaw 設定介面</h1>
+        <div id="configPath" class="muted">正在載入設定...</div>
+      </div>
+      <div class="actions">
+        <button id="reloadBtn" class="btn">重新載入</button>
+        <button id="syncBtn" class="btn">同步 結構化 -> TOML</button>
+        <button id="chmodBtn" class="btn">設定檔權限設為 600</button>
+        <button id="saveStructuredBtn" class="btn btn-primary">儲存結構化設定</button>
+        <button id="saveRawBtn" class="btn btn-warning">儲存原始 TOML</button>
+      </div>
+    </header>
+
+    <section id="warnings" class="warnings hidden"></section>
+    <section id="status" class="status">系統就緒。</section>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <label for="sectionSelect">區段</label>
+        <select id="sectionSelect"></select>
+        <label for="searchInput">搜尋路徑</label>
+        <input id="searchInput" type="text" placeholder="例如：channels_config.telegram" />
+        <div class="hint">欄位依 Schema 自動產生（來源：<code>zeroclaw config schema</code>）。未定義於頂層 Schema 的鍵可在 <code>extensions</code> 區塊編輯。</div>
+      </aside>
+
+      <section class="content">
+        <div class="tabs">
+          <button class="tab active" data-tab="structured">結構化編輯器</button>
+          <button class="tab" data-tab="raw">原始 TOML</button>
+        </div>
+
+        <div id="structuredTab" class="tab-panel active">
+          <div id="formRoot" class="form-root"></div>
+        </div>
+
+        <div id="rawTab" class="tab-panel">
+          <textarea id="rawEditor" spellcheck="false"></textarea>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
