@@ -482,50 +482,26 @@ When working in fast iterative mode:
 - Do not “ship and hope” on security-sensitive paths.
 - If uncertain, leave a concrete TODO with verification context, not a hidden guess.
 
-## 13) Local Fork Workflow Preference (Repository-Specific Override)
+## 13) Agent Topic Index (Split Docs)
 
-For this local workspace, use a fork-first workflow by default.
+Topic-specific guidance is split into:
 
-- Integration target is `origin/main` (personal fork), not `upstream/main`.
-- Do not open PRs to upstream unless the user explicitly asks for upstream contribution.
-- Keep `upstream` only as sync source and `origin` as publish target.
-- Never develop directly on `main`; create or switch to `feat/*` branch first.
+- `docs/agent/README.md`
+- `docs/agent/workflow-local-fork.md`
+- `docs/agent/build-troubleshooting.md`
+- `docs/agent/plugin-playbook.md`
 
-Preferred commands (do not ask user to memorize raw Git steps):
+## 14) Agent Context Loading Policy (On-Demand Required)
 
-- `git zc start <branch>`: sync base then create/switch feature branch.
-- `git zc sync`: sync current branch with upstream (`main` fast-forward, feature branch rebase).
-- `git zc build`: run:
-  - `cargo build --release --locked`
-  - `cargo install --path . --force --locked`
-- `git zc publish`: push current feature branch to `origin`.
-- `git zc doctor`: verify remotes and working tree state.
+To keep context focused and avoid unnecessary token usage:
 
-If sync completed but build fails, use this default next-step sequence:
+- Always read `CLAUDE.md` first for global constraints.
+- Load topic docs from `docs/agent/` only when the task matches that topic.
+- Do not bulk-load all topic docs by default.
+- If multiple topics apply, load only the minimal set needed in execution order.
 
-1. Re-run `git zc sync`.
-2. Re-run `git zc build`.
-3. Capture and inspect the first `error:` line (ignore warnings for initial triage).
-4. Verify toolchain: `rustc --version` and `cargo --version`.
-5. On macOS linker/toolchain issues, run `xcode-select --install`.
-6. If cache/build artifacts are suspected, run `cargo clean` and retry `git zc build`.
+Default topic routing:
 
-## 14) Plugin Planning Placeholder (When Feature Is Not Decided Yet)
-
-If the user asks for a plugin/extension but has not decided concrete functionality yet:
-
-- Do not implement speculative code paths.
-- Start with a short discovery step and propose 2-3 concrete plugin candidates based on existing extension points.
-- Prioritize extension points in this order unless user says otherwise:
-  1. `Tool` (`src/tools/traits.rs`)
-  2. `Channel` (`src/channels/traits.rs`)
-  3. `Provider` (`src/providers/traits.rs`)
-  4. `Peripheral` (`src/peripherals/traits.rs`)
-- Keep implementation scope minimal: new module + factory registration + focused tests.
-- Avoid cross-cutting rewrites when a trait implementation can solve the requirement.
-
-Default next action for undecided plugin requests:
-
-1. Confirm target extension type (Tool/Channel/Provider/Peripheral).
-2. Define one concrete user-facing capability and one non-goal.
-3. Implement only that slice on `feat/*`.
+1. Fork/upstream workflow questions -> `docs/agent/workflow-local-fork.md`
+2. Sync/build failure questions -> `docs/agent/build-troubleshooting.md`
+3. Plugin planning/implementation questions -> `docs/agent/plugin-playbook.md`
