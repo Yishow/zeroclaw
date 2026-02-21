@@ -16,9 +16,10 @@ usage() {
   cat <<'USAGE'
 Git Easy（超簡化版）
 
-主流程（只記這三個）:
+主流程（常用四個）:
   git zc start <分支名>   建立/切換功能分支，並先同步 upstream
   git zc sync            同步目前分支（main 走 ff，功能分支走 rebase）
+  git zc build           執行 release 編譯與安裝
   git zc publish         發布目前分支到 origin
 
 其他指令:
@@ -30,6 +31,7 @@ Git Easy（超簡化版）
 範例:
   git zc start feat/login-ui
   git zc sync
+  git zc build
   git zc publish
 USAGE
 }
@@ -198,6 +200,14 @@ publish_cmd() {
   fi
 }
 
+build_cmd() {
+  info "Running: cargo build --release --locked"
+  cargo build --release --locked
+
+  info "Running: cargo install --path . --force --locked"
+  cargo install --path . --force --locked
+}
+
 doctor_cmd() {
   local saved_user
   saved_user="$(get_saved_user)"
@@ -231,7 +241,10 @@ guide_cmd() {
 2) 跟上游同步：
    git zc sync
 
-3) 發布到你的 fork：
+3) 編譯並安裝：
+   git zc build
+
+4) 發布到你的 fork：
    git zc publish
 
 工作習慣：
@@ -243,6 +256,7 @@ guide_cmd() {
   git zc start feat/notification-settings
   # 開發與 commit...
   git zc sync
+  git zc build
   # 繼續開發與 commit...
   git zc publish
 GUIDE
@@ -255,18 +269,20 @@ menu() {
     echo "Git Easy Menu（只留常用）"
     echo "1) Start（開始/切換功能分支）"
     echo "2) Sync（同步目前分支）"
-    echo "3) Publish（發布目前分支）"
-    echo "4) Doctor（檢查狀態）"
-    echo "5) Guide（再看一次說明）"
+    echo "3) Build（release 編譯與安裝）"
+    echo "4) Publish（發布目前分支）"
+    echo "5) Doctor（檢查狀態）"
+    echo "6) Guide（再看一次說明）"
     echo "0) Exit"
     read -r -p "Choose: " choice
 
     case "${choice}" in
       1) start_cmd ;;
       2) sync_cmd ;;
-      3) publish_cmd ;;
-      4) doctor_cmd ;;
-      5) guide_cmd ;;
+      3) build_cmd ;;
+      4) publish_cmd ;;
+      5) doctor_cmd ;;
+      6) guide_cmd ;;
       0) exit 0 ;;
       *) warn "Unknown option: ${choice}" ;;
     esac
@@ -281,6 +297,7 @@ main() {
     init) init_cmd "${1:-}" ;;
     sync) sync_cmd ;;
     start) start_cmd "${1:-}" ;;
+    build) build_cmd ;;
     publish) publish_cmd ;;
     doctor) doctor_cmd ;;
     guide) guide_cmd ;;
