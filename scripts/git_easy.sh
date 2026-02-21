@@ -14,22 +14,23 @@ cd "${REPO_ROOT}"
 
 usage() {
   cat <<'USAGE'
-Git easy workflow helper for fork + upstream projects.
+Git Easy（超簡化版）
 
-Usage:
-  scripts/git_easy.sh               # interactive menu
-  scripts/git_easy.sh init [user]   # configure remotes and save GitHub user
-  scripts/git_easy.sh sync          # sync current branch with upstream
-  scripts/git_easy.sh start <branch># sync main, then switch/create feature branch
-  scripts/git_easy.sh publish       # push current branch to origin
-  scripts/git_easy.sh doctor        # show workflow health
-  scripts/git_easy.sh help
+主流程（只記這三個）:
+  git zc start <分支名>   建立/切換功能分支，並先同步 upstream
+  git zc sync            同步目前分支（main 走 ff，功能分支走 rebase）
+  git zc publish         發布目前分支到 origin
 
-Examples:
-  scripts/git_easy.sh init Yishow
-  scripts/git_easy.sh start feat/my-feature
-  scripts/git_easy.sh sync
-  scripts/git_easy.sh publish
+其他指令:
+  git zc guide           顯示新手說明與範例
+  git zc doctor          檢查 remote 與目前狀態
+  git zc init [GitHub帳號] 首次初始化（通常只需一次）
+  git zc help
+
+範例:
+  git zc start feat/login-ui
+  git zc sync
+  git zc publish
 USAGE
 }
 
@@ -219,24 +220,53 @@ doctor_cmd() {
   fi
 }
 
+guide_cmd() {
+  cat <<'GUIDE'
+=== Git Easy 使用說明 ===
+
+你平常只要做 3 件事：
+1) 開始新功能：
+   git zc start feat/你的功能名
+
+2) 跟上游同步：
+   git zc sync
+
+3) 發布到你的 fork：
+   git zc publish
+
+工作習慣：
+- 不要在 main 直接開發
+- main 只拿來同步 upstream/main
+- 功能都放在 feat/* 分支
+
+一個完整範例：
+  git zc start feat/notification-settings
+  # 開發與 commit...
+  git zc sync
+  # 繼續開發與 commit...
+  git zc publish
+GUIDE
+}
+
 menu() {
+  guide_cmd
   while true; do
     echo
-    echo "Git Easy Menu"
-    echo "1) Init remotes and user"
-    echo "2) Sync current branch"
-    echo "3) Start or switch feature branch"
-    echo "4) Publish current branch"
-    echo "5) Doctor check"
+    echo "Git Easy Menu（只留常用）"
+    echo "1) Start（開始/切換功能分支）"
+    echo "2) Sync（同步目前分支）"
+    echo "3) Publish（發布目前分支）"
+    echo "4) Doctor（檢查狀態）"
+    echo "5) Guide（再看一次說明）"
     echo "0) Exit"
     read -r -p "Choose: " choice
 
     case "${choice}" in
-      1) init_cmd ;;
+      1) start_cmd ;;
       2) sync_cmd ;;
-      3) start_cmd ;;
-      4) publish_cmd ;;
-      5) doctor_cmd ;;
+      3) publish_cmd ;;
+      4) doctor_cmd ;;
+      5) guide_cmd ;;
       0) exit 0 ;;
       *) warn "Unknown option: ${choice}" ;;
     esac
@@ -253,6 +283,7 @@ main() {
     start) start_cmd "${1:-}" ;;
     publish) publish_cmd ;;
     doctor) doctor_cmd ;;
+    guide) guide_cmd ;;
     menu) menu ;;
     help|-h|--help) usage ;;
     *) error "Unknown command: ${cmd}"; echo; usage; exit 1 ;;
