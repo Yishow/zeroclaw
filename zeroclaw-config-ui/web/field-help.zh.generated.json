@@ -1,22 +1,285 @@
 {
   "_meta": {
-    "generated_at": "2026-02-19T18:20:00Z",
+    "generated_at": "2026-02-22T03:45:00Z",
     "generated_by": "ai-curated-from-readme-and-config-reference",
     "source_files": [
       "README.md",
-      "docs/config-reference.md"
+      "docs/config-reference.md",
+      "docs/channels-reference.md",
+      "docs/nextcloud-talk-setup.md",
+      "docs/hardware-peripherals-design.md"
     ],
-    "notes": "本檔由 AI 根據 README 與 config reference 彙整，供欄位中文說明與範例顯示使用。"
+    "notes": "本檔由 AI 根據 README 與設定文件彙整，供欄位中文說明與範例顯示使用。"
   },
   "fields": {
-    "default_provider": {
-      "purpose_zh": "設定未指定 provider 時的預設模型供應商。",
-      "usage_zh": "容器環境可能受 ZEROCLAW_PROVIDER/PROVIDER 影響；若你在 config.toml 已設定 custom:*，請確認環境變數不會覆蓋。",
+    "api_key": {
+      "purpose_zh": "預設供應商 API 金鑰。",
+      "usage_zh": "若啟用 [secrets].encrypt，儲存時會加密；高安全需求建議改用環境變數注入。",
       "examples": [
-        "default_provider = \"openrouter\"",
-        "default_provider = \"custom:https://your-api.com\""
+        "api_key = \"sk-...\"",
+        "api_key = \"ollama_api_key_here\""
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "README.md"
+      ]
+    },
+    "api_url": {
+      "purpose_zh": "覆寫供應商 API 基底 URL，用於遠端或自建相容端點。",
+      "usage_zh": "常見於遠端 Ollama 或 OpenAI 相容網關。",
+      "examples": [
+        "api_url = \"https://ollama.com\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "autonomy.allowed_commands.[]": {
+      "purpose_zh": "命令白名單。",
+      "usage_zh": "僅加入必要命令，避免過度授權。",
+      "examples": [
+        "[autonomy] allowed_commands = [\"git\", \"npm\", \"cargo\", \"ls\", \"cat\", \"grep\"]"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "autonomy.allowed_roots.[]": {
+      "purpose_zh": "額外允許存取的根目錄白名單。",
+      "usage_zh": "即使 workspace_only=false，仍需在此明確列入可存取根目錄。",
+      "examples": [
+        "[autonomy]\nallowed_roots = [\"~/Desktop/projects\", \"/opt/shared-repo\"]"
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "autonomy.forbidden_paths.[]": {
+      "purpose_zh": "禁止存取路徑清單。",
+      "usage_zh": "建議封鎖系統目錄與金鑰路徑，如 ~/.ssh。",
+      "examples": [
+        "[autonomy] forbidden_paths = [\"/etc\", \"/root\", \"/proc\", \"/sys\", \"~/.ssh\"]"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "autonomy.level": {
+      "purpose_zh": "設定代理自主等級（readonly/supervised/full）。",
+      "usage_zh": "full 代表更高自動化，請同時嚴格設定 allowed_commands 與風險限制。",
+      "examples": [
+        "[autonomy] level = \"supervised\""
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "autonomy.max_actions_per_hour": {
+      "purpose_zh": "每小時可執行動作上限。",
+      "usage_zh": "用於節流代理行為，避免短時間內大量操作。",
+      "examples": [
+        "[autonomy] max_actions_per_hour = 20"
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "autonomy.max_cost_per_day_cents": {
+      "purpose_zh": "每日可接受成本上限（美分）。",
+      "usage_zh": "建議與 [cost] 設定共同調整，形成雙重成本保護。",
+      "examples": [
+        "[autonomy] max_cost_per_day_cents = 500"
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "autonomy.workspace_only": {
+      "purpose_zh": "限制操作範圍在 workspace 內。",
+      "usage_zh": "建議保持 true，以降低誤操作風險。",
+      "examples": [
+        "[autonomy] workspace_only = true"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "browser.allowed_domains.[]": {
+      "purpose_zh": "瀏覽器工具允許的網域白名單。",
+      "usage_zh": "開啟 browser 後應明確設定白名單，避免任意外連。",
+      "examples": [
+        "[browser] allowed_domains = [\"docs.rs\"]"
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "browser.backend": {
+      "purpose_zh": "設定瀏覽器工具後端實作。",
+      "usage_zh": "可在 agent_browser、rust_native、computer_use、auto 間切換。",
+      "examples": [
+        "[browser] backend = \"agent_browser\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "browser.computer_use.allow_remote_endpoint": {
+      "purpose_zh": "是否允許遠端 computer-use endpoint。",
+      "usage_zh": "安全預設為 false；僅在受控網路下再考慮啟用。",
+      "examples": [
+        "[browser.computer_use] allow_remote_endpoint = false"
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "browser.computer_use.endpoint": {
+      "purpose_zh": "設定 computer-use 側車服務 endpoint。",
+      "usage_zh": "建議使用 localhost/private endpoint，避免遠端暴露。",
+      "examples": [
+        "[browser.computer_use] endpoint = \"http://127.0.0.1:8787/v1/actions\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "browser.enabled": {
+      "purpose_zh": "是否啟用瀏覽器工具。",
+      "usage_zh": "建議預設關閉，需要時再開啟並限制 allowed_domains。",
+      "examples": [
+        "[browser] enabled = false"
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "channels_config.linq.api_token": {
+      "purpose_zh": "Linq Partner API 的存取權杖。",
+      "usage_zh": "建議搭配 allowed_senders 白名單，避免未授權來源觸發。",
+      "examples": [
+        "[channels_config.linq]\napi_token = \"linq_token_here\""
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "channels_config.message_timeout_secs": {
+      "purpose_zh": "單則通道訊息處理逾時秒數。",
+      "usage_zh": "本地模型通常較慢，可維持較高值（例如 300）。",
+      "examples": [
+        "[channels_config] message_timeout_secs = 300"
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "channels_config.nextcloud_talk.base_url": {
+      "purpose_zh": "Nextcloud Talk 服務基底 URL。",
+      "usage_zh": "需與 app_token/webhook 設定一致，並確認反向代理路由正確。",
+      "examples": [
+        "[channels_config.nextcloud_talk]\nbase_url = \"https://cloud.example.com\""
+      ],
+      "sources": [
+        "docs/config-reference.md",
+        "docs/nextcloud-talk-setup.md"
+      ]
+    },
+    "channels_config.nostr.private_key": {
+      "purpose_zh": "Nostr 私鑰，用於接收與回覆私訊。",
+      "usage_zh": "屬高敏感資料，建議保留 secrets.encrypt=true 並限制檔案權限為 600。",
+      "examples": [
+        "[channels_config.nostr]\nprivate_key = \"nsec1...\""
+      ],
+      "sources": [
+        "docs/config-reference.md",
+        "docs/channels-reference.md"
+      ]
+    },
+    "channels_config.telegram.bot_token": {
+      "purpose_zh": "Telegram 機器人 API 權杖。",
+      "usage_zh": "屬敏感資訊，建議搭配 secrets.encrypt 或環境變數。",
+      "examples": [
+        "[channels_config.telegram] bot_token = \"123456:ABCDEF\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "channels_config.whatsapp.access_token": {
+      "purpose_zh": "WhatsApp Cloud API 存取權杖。",
+      "usage_zh": "需與 phone_number_id、verify_token 配合，並完成 Meta webhook 設定。",
+      "examples": [
+        "[channels_config.whatsapp] access_token = \"EAABx...\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "channels_config.whatsapp.allowed_numbers.[]": {
+      "purpose_zh": "允許互動的 WhatsApp 號碼白名單。",
+      "usage_zh": "可填 E.164 格式；若設為 * 代表允許全部來源。",
+      "examples": [
+        "[channels_config.whatsapp] allowed_numbers = [\"+1234567890\"]"
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "channels_config.whatsapp.phone_number_id": {
+      "purpose_zh": "WhatsApp Business 電話號碼 ID。",
+      "usage_zh": "必填，對應 Meta 後台中的電話號碼識別值。",
+      "examples": [
+        "[channels_config.whatsapp] phone_number_id = \"123456789012345\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "channels_config.whatsapp.verify_token": {
+      "purpose_zh": "Webhook 驗證 token。",
+      "usage_zh": "需與 Meta Webhook 設定中的 Verify Token 完全一致。",
+      "examples": [
+        "[channels_config.whatsapp] verify_token = \"my-secret-verify-token\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "composio.enabled": {
+      "purpose_zh": "是否啟用 Composio OAuth 工具整合。",
+      "usage_zh": "若未啟用或未提供 api_key，對應工具不會註冊。",
+      "examples": [
+        "[composio] enabled = false"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "composio.entity_id": {
+      "purpose_zh": "Composio 預設 user_id。",
+      "usage_zh": "可依租戶或使用者策略區分 entity。",
+      "examples": [
+        "[composio] entity_id = \"default\""
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "cost.enabled": {
+      "purpose_zh": "是否啟用成本追蹤與預算保護。",
+      "usage_zh": "在多人或長時間自動執行場景建議開啟，避免模型成本失控。",
+      "examples": [
+        "[cost] enabled = true"
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
     "default_model": {
       "purpose_zh": "設定預設模型 ID。當請求未明確指定模型時會使用此值。",
@@ -25,7 +288,22 @@
         "default_model = \"anthropic/claude-sonnet-4-6\"",
         "default_model = \"qwen3:cloud\""
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "default_provider": {
+      "purpose_zh": "設定未指定 provider 時的預設模型供應商。",
+      "usage_zh": "容器環境可能受 ZEROCLAW_PROVIDER/PROVIDER 影響；若你在 config.toml 已設定 custom:*，請確認環境變數不會覆蓋。",
+      "examples": [
+        "default_provider = \"openrouter\"",
+        "default_provider = \"custom:https://your-api.com\""
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
     },
     "default_temperature": {
       "purpose_zh": "控制模型回應隨機性；值越高通常越發散。",
@@ -33,24 +311,135 @@
       "examples": [
         "default_temperature = 0.7"
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
     },
-    "api_key": {
-      "purpose_zh": "預設供應商 API 金鑰。",
-      "usage_zh": "若啟用 [secrets].encrypt，儲存時會加密；高安全需求建議改用環境變數注入。",
+    "embedding_routes.[].dimensions": {
+      "purpose_zh": "設定 embedding 向量維度。",
+      "usage_zh": "維度必須與模型輸出一致。",
       "examples": [
-        "api_key = \"sk-...\"",
-        "api_key = \"ollama_api_key_here\""
+        "[[embedding_routes]] dimensions = 1536"
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "api_url": {
-      "purpose_zh": "覆寫供應商 API 基底 URL，用於遠端或自建相容端點。",
-      "usage_zh": "常見於遠端 Ollama 或 OpenAI 相容網關。",
+    "embedding_routes.[].hint": {
+      "purpose_zh": "定義 embedding 路由提示名稱。",
+      "usage_zh": "與 memory.embedding_model 的 hint:xxx 配合使用。",
       "examples": [
-        "api_url = \"https://ollama.com\""
+        "[[embedding_routes]] hint = \"semantic\""
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "embedding_routes.[].model": {
+      "purpose_zh": "設定 embedding 路由實際模型。",
+      "usage_zh": "請同步檢查 dimensions，避免向量維度不一致。",
+      "examples": [
+        "[[embedding_routes]] model = \"text-embedding-3-small\""
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "gateway.allow_public_bind": {
+      "purpose_zh": "是否允許公開網路綁定。",
+      "usage_zh": "預設 false；若需公開請搭配隧道、認證與速率限制。",
+      "examples": [
+        "[gateway] allow_public_bind = false"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "gateway.host": {
+      "purpose_zh": "設定 gateway 綁定主機位址。",
+      "usage_zh": "預設 127.0.0.1 較安全；公開綁定前請先配置 tunnel/防護。",
+      "examples": [
+        "[gateway] host = \"127.0.0.1\""
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "gateway.port": {
+      "purpose_zh": "設定 gateway 監聽埠。",
+      "usage_zh": "確保埠未被占用，並與反向代理或 tunnel 設定一致。",
+      "examples": [
+        "[gateway] port = 3000"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "gateway.require_pairing": {
+      "purpose_zh": "是否要求首次配對後才允許 Bearer 存取。",
+      "usage_zh": "建議保持 true，避免誤曝露。",
+      "examples": [
+        "[gateway] require_pairing = true"
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "hardware.enabled": {
+      "purpose_zh": "是否啟用硬體向導能力（serial/probe/native）。",
+      "usage_zh": "只有在實際需要板卡互動時啟用，避免不必要的硬體表面暴露。",
+      "examples": [
+        "[hardware] enabled = true"
+      ],
+      "sources": [
+        "docs/config-reference.md",
+        "README.md"
+      ]
+    },
+    "heartbeat.enabled": {
+      "purpose_zh": "是否啟用心跳檢查。",
+      "usage_zh": "長時間常駐服務建議啟用，以利觀測。",
+      "examples": [
+        "[heartbeat] enabled = false"
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "heartbeat.interval_minutes": {
+      "purpose_zh": "設定心跳間隔（分鐘）。",
+      "usage_zh": "間隔過短會增加噪音，過長則不利及時告警。",
+      "examples": [
+        "[heartbeat] interval_minutes = 30"
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "http_request.enabled": {
+      "purpose_zh": "是否啟用 HTTP request 工具。",
+      "usage_zh": "預設關閉；啟用後仍需搭配 allowed_domains 才能實際對外請求。",
+      "examples": [
+        "[http_request] enabled = true"
+      ],
+      "sources": [
+        "docs/config-reference.md"
+      ]
+    },
+    "identity.format": {
+      "purpose_zh": "設定身份資料格式。",
+      "usage_zh": "openclaw 為預設；aieos 適合與既有 JSON 身份檔整合。",
+      "examples": [
+        "[identity] format = \"openclaw\""
+      ],
+      "sources": [
+        "README.md"
+      ]
     },
     "memory.backend": {
       "purpose_zh": "設定記憶後端型別。",
@@ -59,16 +448,20 @@
         "[memory] backend = \"sqlite\"",
         "[memory] backend = \"none\""
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
     },
-    "memory.embedding_provider": {
-      "purpose_zh": "設定嵌入模型供應商。",
-      "usage_zh": "若不使用向量檢索可維持 none；若使用，需同時確認 model/dimensions 一致。",
+    "memory.embedding_dimensions": {
+      "purpose_zh": "設定記憶嵌入向量維度。",
+      "usage_zh": "必須與 embedding_model 或 embedding_routes 的實際輸出維度一致。",
       "examples": [
-        "[memory] embedding_provider = \"none\"",
-        "[memory] embedding_provider = \"openai\""
+        "[memory] embedding_dimensions = 1536"
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
     "memory.embedding_model": {
       "purpose_zh": "設定嵌入模型 ID 或 hint 路由名稱。",
@@ -77,7 +470,22 @@
         "[memory] embedding_model = \"text-embedding-3-small\"",
         "[memory] embedding_model = \"hint:semantic\""
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
+    },
+    "memory.embedding_provider": {
+      "purpose_zh": "設定嵌入模型供應商。",
+      "usage_zh": "若不使用向量檢索可維持 none；若使用，需同時確認 model/dimensions 一致。",
+      "examples": [
+        "[memory] embedding_provider = \"none\"",
+        "[memory] embedding_provider = \"openai\""
+      ],
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
     },
     "model_routes.[].hint": {
       "purpose_zh": "定義模型路由提示名稱（hint）。",
@@ -85,15 +493,9 @@
       "examples": [
         "[[model_routes]] hint = \"reasoning\""
       ],
-      "sources": ["docs/config-reference.md"]
-    },
-    "model_routes.[].provider": {
-      "purpose_zh": "設定該路由對應的 provider。",
-      "usage_zh": "和 hint/model 一起形成完整路由。",
-      "examples": [
-        "[[model_routes]] provider = \"openrouter\""
-      ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
     "model_routes.[].model": {
       "purpose_zh": "設定該路由對應的模型 ID。",
@@ -101,103 +503,82 @@
       "examples": [
         "[[model_routes]] model = \"provider/model-id\""
       ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "embedding_routes.[].hint": {
-      "purpose_zh": "定義 embedding 路由提示名稱。",
-      "usage_zh": "與 memory.embedding_model 的 hint:xxx 配合使用。",
+    "model_routes.[].provider": {
+      "purpose_zh": "設定該路由對應的 provider。",
+      "usage_zh": "和 hint/model 一起形成完整路由。",
       "examples": [
-        "[[embedding_routes]] hint = \"semantic\""
+        "[[model_routes]] provider = \"openrouter\""
       ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "embedding_routes.[].model": {
-      "purpose_zh": "設定 embedding 路由實際模型。",
-      "usage_zh": "請同步檢查 dimensions，避免向量維度不一致。",
+    "observability.backend": {
+      "purpose_zh": "設定可觀測性後端類型，控制是否輸出 traces/metrics。",
+      "usage_zh": "本機除錯可用 log；若要接監控平台可用 otel/otlp，正式環境請避免不必要的 full trace。",
       "examples": [
-        "[[embedding_routes]] model = \"text-embedding-3-small\""
+        "[observability] backend = \"otel\""
       ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "README.md",
+        "docs/config-reference.md"
+      ]
     },
-    "embedding_routes.[].dimensions": {
-      "purpose_zh": "設定 embedding 向量維度。",
-      "usage_zh": "維度必須與模型輸出一致。",
+    "observability.runtime_trace_mode": {
+      "purpose_zh": "設定執行時追蹤資料保存模式。",
+      "usage_zh": "rolling 適合日常除錯；full 可能包含更多模型輸出內容，僅建議短期排障使用。",
       "examples": [
-        "[[embedding_routes]] dimensions = 1536"
+        "[observability] runtime_trace_mode = \"rolling\""
       ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "gateway.host": {
-      "purpose_zh": "設定 gateway 綁定主機位址。",
-      "usage_zh": "預設 127.0.0.1 較安全；公開綁定前請先配置 tunnel/防護。",
+    "peripherals.boards.[].board": {
+      "purpose_zh": "宣告每個周邊條目的板卡類型。",
+      "usage_zh": "需填可支援的 board ID（如 nucleo-f401re、rpi-gpio），並與 transport/path 相容。",
       "examples": [
-        "[gateway] host = \"127.0.0.1\""
+        "[[peripherals.boards]]\nboard = \"nucleo-f401re\""
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md",
+        "docs/hardware-peripherals-design.md"
+      ]
     },
-    "gateway.port": {
-      "purpose_zh": "設定 gateway 監聽埠。",
-      "usage_zh": "確保埠未被占用，並與反向代理或 tunnel 設定一致。",
+    "peripherals.enabled": {
+      "purpose_zh": "是否啟用周邊板卡整合，讓板卡能力註冊為工具。",
+      "usage_zh": "搭配 [[peripherals.boards]] 宣告實際板卡；不用時建議保持 false。",
       "examples": [
-        "[gateway] port = 3000"
+        "[peripherals] enabled = true"
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md",
+        "docs/hardware-peripherals-design.md"
+      ]
     },
-    "gateway.require_pairing": {
-      "purpose_zh": "是否要求首次配對後才允許 Bearer 存取。",
-      "usage_zh": "建議保持 true，避免誤曝露。",
+    "query_classification.enabled": {
+      "purpose_zh": "啟用查詢自動分類，依規則路由到對應模型 hint。",
+      "usage_zh": "搭配 [[query_classification.rules]] 設定可讓短問候與長推理走不同模型。",
       "examples": [
-        "[gateway] require_pairing = true"
+        "[query_classification] enabled = true"
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "gateway.allow_public_bind": {
-      "purpose_zh": "是否允許公開網路綁定。",
-      "usage_zh": "預設 false；若需公開請搭配隧道、認證與速率限制。",
+    "query_classification.rules.[].hint": {
+      "purpose_zh": "每條分類規則對應的目標模型 hint。",
+      "usage_zh": "必須對應既有 [[model_routes]] 的 hint，否則分類命中後無法正確路由。",
       "examples": [
-        "[gateway] allow_public_bind = false"
+        "[[query_classification.rules]]\nhint = \"reasoning\""
       ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "autonomy.level": {
-      "purpose_zh": "設定代理自主等級（readonly/supervised/full）。",
-      "usage_zh": "full 代表更高自動化，請同時嚴格設定 allowed_commands 與風險限制。",
-      "examples": [
-        "[autonomy] level = \"supervised\""
-      ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "autonomy.workspace_only": {
-      "purpose_zh": "限制操作範圍在 workspace 內。",
-      "usage_zh": "建議保持 true，以降低誤操作風險。",
-      "examples": [
-        "[autonomy] workspace_only = true"
-      ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "autonomy.allowed_commands.[]": {
-      "purpose_zh": "命令白名單。",
-      "usage_zh": "僅加入必要命令，避免過度授權。",
-      "examples": [
-        "[autonomy] allowed_commands = [\"git\", \"npm\", \"cargo\", \"ls\", \"cat\", \"grep\"]"
-      ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "autonomy.forbidden_paths.[]": {
-      "purpose_zh": "禁止存取路徑清單。",
-      "usage_zh": "建議封鎖系統目錄與金鑰路徑，如 ~/.ssh。",
-      "examples": [
-        "[autonomy] forbidden_paths = [\"/etc\", \"/root\", \"/proc\", \"/sys\", \"~/.ssh\"]"
-      ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "runtime.kind": {
-      "purpose_zh": "設定執行時型別。",
-      "usage_zh": "native 直跑本機，docker 透過容器隔離。",
-      "examples": [
-        "[runtime] kind = \"native\""
-      ],
-      "sources": ["README.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
     "runtime.docker.image": {
       "purpose_zh": "設定容器執行映像檔。",
@@ -205,7 +586,9 @@
       "examples": [
         "[runtime.docker] image = \"alpine:3.20\""
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "README.md"
+      ]
     },
     "runtime.docker.network": {
       "purpose_zh": "設定容器網路模式。",
@@ -213,7 +596,9 @@
       "examples": [
         "[runtime.docker] network = \"none\""
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "README.md"
+      ]
     },
     "runtime.docker.read_only_rootfs": {
       "purpose_zh": "是否以唯讀根檔案系統執行容器。",
@@ -221,31 +606,19 @@
       "examples": [
         "[runtime.docker] read_only_rootfs = true"
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "README.md"
+      ]
     },
-    "heartbeat.enabled": {
-      "purpose_zh": "是否啟用心跳檢查。",
-      "usage_zh": "長時間常駐服務建議啟用，以利觀測。",
+    "runtime.kind": {
+      "purpose_zh": "設定執行時型別。",
+      "usage_zh": "native 直跑本機，docker 透過容器隔離。",
       "examples": [
-        "[heartbeat] enabled = false"
+        "[runtime] kind = \"native\""
       ],
-      "sources": ["README.md"]
-    },
-    "heartbeat.interval_minutes": {
-      "purpose_zh": "設定心跳間隔（分鐘）。",
-      "usage_zh": "間隔過短會增加噪音，過長則不利及時告警。",
-      "examples": [
-        "[heartbeat] interval_minutes = 30"
-      ],
-      "sources": ["README.md"]
-    },
-    "tunnel.provider": {
-      "purpose_zh": "設定內網穿透方案。",
-      "usage_zh": "若對外 webhook（例如 WhatsApp）通常需要 non-none 的 provider。",
-      "examples": [
-        "[tunnel] provider = \"none\""
-      ],
-      "sources": ["README.md"]
+      "sources": [
+        "README.md"
+      ]
     },
     "secrets.encrypt": {
       "purpose_zh": "是否加密儲存在 config.toml 的敏感欄位。",
@@ -253,127 +626,39 @@
       "examples": [
         "[secrets] encrypt = true"
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "README.md"
+      ]
     },
-    "browser.enabled": {
-      "purpose_zh": "是否啟用瀏覽器工具。",
-      "usage_zh": "建議預設關閉，需要時再開啟並限制 allowed_domains。",
+    "security.estop.enabled": {
+      "purpose_zh": "啟用緊急停止（e-stop）狀態機。",
+      "usage_zh": "當需要快速封鎖執行行為時啟用，並搭配 CLI 的 estop/resume 流程操作。",
       "examples": [
-        "[browser] enabled = false"
+        "[security.estop] enabled = true"
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "browser.allowed_domains.[]": {
-      "purpose_zh": "瀏覽器工具允許的網域白名單。",
-      "usage_zh": "開啟 browser 後應明確設定白名單，避免任意外連。",
+    "security.otp.enabled": {
+      "purpose_zh": "啟用 OTP 安全閘門，保護高風險操作與敏感網域。",
+      "usage_zh": "建議在可執行 shell/瀏覽器動作的環境中開啟，並搭配 gated_actions 與 gated_domains。",
       "examples": [
-        "[browser] allowed_domains = [\"docs.rs\"]"
+        "[security.otp] enabled = true"
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
-    "browser.backend": {
-      "purpose_zh": "設定瀏覽器工具後端實作。",
-      "usage_zh": "可在 agent_browser、rust_native、computer_use、auto 間切換。",
+    "skills.open_skills_enabled": {
+      "purpose_zh": "是否啟用社群 open-skills 倉庫載入與同步。",
+      "usage_zh": "預設建議關閉；只有在你明確需要外部技能時才開啟，以降低供應鏈風險。",
       "examples": [
-        "[browser] backend = \"agent_browser\""
+        "[skills] open_skills_enabled = false"
       ],
-      "sources": ["README.md"]
-    },
-    "browser.computer_use.endpoint": {
-      "purpose_zh": "設定 computer-use 側車服務 endpoint。",
-      "usage_zh": "建議使用 localhost/private endpoint，避免遠端暴露。",
-      "examples": [
-        "[browser.computer_use] endpoint = \"http://127.0.0.1:8787/v1/actions\""
-      ],
-      "sources": ["README.md"]
-    },
-    "browser.computer_use.allow_remote_endpoint": {
-      "purpose_zh": "是否允許遠端 computer-use endpoint。",
-      "usage_zh": "安全預設為 false；僅在受控網路下再考慮啟用。",
-      "examples": [
-        "[browser.computer_use] allow_remote_endpoint = false"
-      ],
-      "sources": ["README.md"]
-    },
-    "channels_config.message_timeout_secs": {
-      "purpose_zh": "單則通道訊息處理逾時秒數。",
-      "usage_zh": "本地模型通常較慢，可維持較高值（例如 300）。",
-      "examples": [
-        "[channels_config] message_timeout_secs = 300"
-      ],
-      "sources": ["docs/config-reference.md"]
-    },
-    "channels_config.telegram.bot_token": {
-      "purpose_zh": "Telegram 機器人 API 權杖。",
-      "usage_zh": "屬敏感資訊，建議搭配 secrets.encrypt 或環境變數。",
-      "examples": [
-        "[channels_config.telegram] bot_token = \"123456:ABCDEF\""
-      ],
-      "sources": ["README.md"]
-    },
-    "channels_config.whatsapp.access_token": {
-      "purpose_zh": "WhatsApp Cloud API 存取權杖。",
-      "usage_zh": "需與 phone_number_id、verify_token 配合，並完成 Meta webhook 設定。",
-      "examples": [
-        "[channels_config.whatsapp] access_token = \"EAABx...\""
-      ],
-      "sources": ["README.md"]
-    },
-    "channels_config.whatsapp.phone_number_id": {
-      "purpose_zh": "WhatsApp Business 電話號碼 ID。",
-      "usage_zh": "必填，對應 Meta 後台中的電話號碼識別值。",
-      "examples": [
-        "[channels_config.whatsapp] phone_number_id = \"123456789012345\""
-      ],
-      "sources": ["README.md"]
-    },
-    "channels_config.whatsapp.verify_token": {
-      "purpose_zh": "Webhook 驗證 token。",
-      "usage_zh": "需與 Meta Webhook 設定中的 Verify Token 完全一致。",
-      "examples": [
-        "[channels_config.whatsapp] verify_token = \"my-secret-verify-token\""
-      ],
-      "sources": ["README.md"]
-    },
-    "channels_config.whatsapp.allowed_numbers.[]": {
-      "purpose_zh": "允許互動的 WhatsApp 號碼白名單。",
-      "usage_zh": "可填 E.164 格式；若設為 * 代表允許全部來源。",
-      "examples": [
-        "[channels_config.whatsapp] allowed_numbers = [\"+1234567890\"]"
-      ],
-      "sources": ["README.md"]
-    },
-    "composio.enabled": {
-      "purpose_zh": "是否啟用 Composio OAuth 工具整合。",
-      "usage_zh": "若未啟用或未提供 api_key，對應工具不會註冊。",
-      "examples": [
-        "[composio] enabled = false"
-      ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "composio.entity_id": {
-      "purpose_zh": "Composio 預設 user_id。",
-      "usage_zh": "可依租戶或使用者策略區分 entity。",
-      "examples": [
-        "[composio] entity_id = \"default\""
-      ],
-      "sources": ["README.md", "docs/config-reference.md"]
-    },
-    "identity.format": {
-      "purpose_zh": "設定身份資料格式。",
-      "usage_zh": "openclaw 為預設；aieos 適合與既有 JSON 身份檔整合。",
-      "examples": [
-        "[identity] format = \"openclaw\""
-      ],
-      "sources": ["README.md"]
-    },
-    "storage.provider.config.provider": {
-      "purpose_zh": "設定遠端儲存 provider。",
-      "usage_zh": "若要使用 PostgreSQL 等後端，需與 db_url/schema/table 一起設定。",
-      "examples": [
-        "[storage.provider.config] provider = \"postgres\""
-      ],
-      "sources": ["README.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
     "storage.provider.config.db_url": {
       "purpose_zh": "儲存後端連線字串。",
@@ -381,7 +666,29 @@
       "examples": [
         "[storage.provider.config] db_url = \"postgres://user:password@host:5432/zeroclaw\""
       ],
-      "sources": ["README.md"]
+      "sources": [
+        "README.md"
+      ]
+    },
+    "storage.provider.config.provider": {
+      "purpose_zh": "設定遠端儲存 provider。",
+      "usage_zh": "若要使用 PostgreSQL 等後端，需與 db_url/schema/table 一起設定。",
+      "examples": [
+        "[storage.provider.config] provider = \"postgres\""
+      ],
+      "sources": [
+        "README.md"
+      ]
+    },
+    "tunnel.provider": {
+      "purpose_zh": "設定內網穿透方案。",
+      "usage_zh": "若對外 webhook（例如 WhatsApp）通常需要 non-none 的 provider。",
+      "examples": [
+        "[tunnel] provider = \"none\""
+      ],
+      "sources": [
+        "README.md"
+      ]
     },
     "web_search.enabled": {
       "purpose_zh": "是否啟用網路搜尋能力。",
@@ -389,7 +696,9 @@
       "examples": [
         "[web_search] enabled = true"
       ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     },
     "web_search.provider": {
       "purpose_zh": "設定網路搜尋供應商。",
@@ -397,7 +706,9 @@
       "examples": [
         "[web_search] provider = \"duckduckgo\""
       ],
-      "sources": ["docs/config-reference.md"]
+      "sources": [
+        "docs/config-reference.md"
+      ]
     }
   }
 }
