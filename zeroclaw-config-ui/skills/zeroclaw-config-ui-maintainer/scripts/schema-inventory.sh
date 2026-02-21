@@ -31,4 +31,16 @@ echo "$SCHEMA_JSON" | jq -r '
   .properties | to_entries[] | walk([.key]; .value)
 ' | tee /tmp/zeroclaw-config-ui-paths.tsv >/dev/null
 
-echo "Leaf paths: $(wc -l < /tmp/zeroclaw-config-ui-paths.tsv | tr -d ' ')"
+LEAF_COUNT="$(wc -l < /tmp/zeroclaw-config-ui-paths.tsv | tr -d ' ')"
+LEAF_SIG="$(
+  cut -f1 /tmp/zeroclaw-config-ui-paths.tsv | sort -u | python3 -c '
+import hashlib, sys
+paths = [line.strip() for line in sys.stdin if line.strip()]
+body = "\n".join(paths)
+print(hashlib.sha256(body.encode("utf-8")).hexdigest())
+'
+)"
+
+echo "Leaf paths: $LEAF_COUNT"
+echo "Schema leaf count (meta): $LEAF_COUNT"
+echo "Schema signature (meta): $LEAF_SIG"

@@ -19,8 +19,9 @@ Use this skill for all work under `zeroclaw-config-ui/`.
 5. Do not bypass `buildFieldHelpLines`/`renderFieldHelp` for newly rendered field branches.
 6. Use AI analysis (not regex parsing scripts) to read `README.md` and config docs, then update `web/field-help.zh.generated.json`.
 7. For each newly documented field, include both `purpose_zh` and at least one usage example.
-8. Save config atomically and keep backup behavior.
-9. Keep output binary install path under `~/.zeroclaw/`.
+8. `usage_zh` is required for each documented field (not optional).
+9. Save config atomically and keep backup behavior.
+10. Keep output binary install path under `~/.zeroclaw/`.
 
 ## Extension Auto-Add Contract
 
@@ -49,8 +50,15 @@ When ZeroClaw introduces new config keys:
 - Authoring reference: `skills/zeroclaw-config-ui-maintainer/references/ai-field-doc-authoring.zh.md`
 - Required fields per entry:
   - `purpose_zh`: Chinese purpose description
-  - `usage_zh`: Chinese usage notes (recommended)
+  - `usage_zh`: Chinese usage notes (required)
   - `examples`: TOML examples mapped to the same field path
+- Path convention:
+  - use canonical schema-style paths such as `gateway.port`, `model_routes.[].hint`, `extensions.*`
+  - avoid ad-hoc path aliases
+- Metadata contract:
+  - keep `_meta.generated_at` fresh
+  - keep `_meta.schema_leaf_count` and `_meta.schema_signature` aligned with current `zeroclaw config schema`
+- High-risk fields (tokens/secrets/security/gateway) must include Chinese safety wording in purpose/usage.
 - Prioritize exact field path mapping (for example `gateway.port`, `autonomy.level`, `model_routes.[].hint`)
 
 ## Validation
@@ -63,6 +71,7 @@ bash -n zeroclaw-config-ui/scripts/build-to-home.sh zeroclaw-config-ui/scripts/r
 bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/schema-inventory.sh
 python3 zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-field-help-json.py
 bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-zh-descriptions.sh
+bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-ui-help-smoke.sh
 ```
 
 If network is available, also run:

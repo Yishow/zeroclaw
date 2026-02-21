@@ -19,13 +19,21 @@
 3. 由 AI 生成 `fields.<path>` 條目。
 4. 每個條目至少包含：
    - `purpose_zh`
+   - `usage_zh`（必填）
    - `examples`（至少 1 個）
-5. 盡量補 `usage_zh`，特別是安全性與風險欄位。
-6. 執行驗證腳本：
+5. 所有高風險欄位（token/secret/security/gateway）在 `purpose_zh` 或 `usage_zh` 必須包含中文安全提醒。
+6. 路徑必須使用 schema 標準格式（如 `model_routes.[].hint`、`extensions.*`）。
+7. 更新 `_meta`：
+   - `generated_at`
+   - `schema_leaf_count`
+   - `schema_signature`
+8. 覆蓋率需達檢查門檻（預設 20%，可用 `FIELD_HELP_MIN_COVERAGE` 調整）。
+9. 執行驗證腳本：
 
 ```bash
 python3 zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-field-help-json.py
 bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-zh-descriptions.sh
+bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-ui-help-smoke.sh
 ```
 
 ## 條目格式範例

@@ -58,11 +58,16 @@ zeroclaw-config-ui-maintainer
 
 1. 依技能流程，用 AI 分析 `README.md` 與 `docs/config-reference.md`。
 2. 更新 `zeroclaw-config-ui/web/field-help.zh.generated.json`（欄位用途 + 使用建議 + 範例）。
+   - 每筆 `fields.<path>` 需要 `purpose_zh`、`usage_zh`、`examples`。
+   - 路徑格式需對齊 schema（例如 `model_routes.[].hint`、`extensions.*`）。
+   - `_meta` 需同步 `generated_at`、`schema_leaf_count`、`schema_signature`。
 3. 執行驗證：
 
 ```bash
+bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/schema-inventory.sh
 python3 zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-field-help-json.py
 bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-zh-descriptions.sh
+bash zeroclaw-config-ui/skills/zeroclaw-config-ui-maintainer/scripts/check-ui-help-smoke.sh
 ```
 
 ## Optional Environment Variables

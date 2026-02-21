@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated_at": "2026-02-22T03:45:00Z",
+    "generated_at": "2026-02-22T04:33:00Z",
     "generated_by": "ai-curated-from-readme-and-config-reference",
     "source_files": [
       "README.md",
@@ -9,7 +9,9 @@
       "docs/nextcloud-talk-setup.md",
       "docs/hardware-peripherals-design.md"
     ],
-    "notes": "本檔由 AI 根據 README 與設定文件彙整，供欄位中文說明與範例顯示使用。"
+    "notes": "本檔由 AI 根據 README 與設定文件彙整，供欄位中文說明與範例顯示使用。",
+    "schema_leaf_count": 312,
+    "schema_signature": "eb4796b0aa88da33a5967545b1f54e9603683693469d79c5e1130152787e0300"
   },
   "fields": {
     "api_key": {
@@ -159,7 +161,7 @@
     },
     "channels_config.linq.api_token": {
       "purpose_zh": "Linq Partner API 的存取權杖。",
-      "usage_zh": "建議搭配 allowed_senders 白名單，避免未授權來源觸發。",
+      "usage_zh": "屬敏感憑證，請使用最小權限 token，並搭配 allowed_senders 白名單降低安全風險。",
       "examples": [
         "[channels_config.linq]\napi_token = \"linq_token_here\""
       ],
@@ -211,7 +213,7 @@
     },
     "channels_config.whatsapp.access_token": {
       "purpose_zh": "WhatsApp Cloud API 存取權杖。",
-      "usage_zh": "需與 phone_number_id、verify_token 配合，並完成 Meta webhook 設定。",
+      "usage_zh": "屬高敏感憑證，建議啟用加密儲存並限制檔案權限，避免外洩。",
       "examples": [
         "[channels_config.whatsapp] access_token = \"EAABx...\""
       ],
@@ -241,7 +243,7 @@
     },
     "channels_config.whatsapp.verify_token": {
       "purpose_zh": "Webhook 驗證 token。",
-      "usage_zh": "需與 Meta Webhook 設定中的 Verify Token 完全一致。",
+      "usage_zh": "請使用高強度隨機值並妥善保存，用於 webhook 驗證安全保護。",
       "examples": [
         "[channels_config.whatsapp] verify_token = \"my-secret-verify-token\""
       ],
@@ -348,7 +350,7 @@
     },
     "gateway.allow_public_bind": {
       "purpose_zh": "是否允許公開網路綁定。",
-      "usage_zh": "預設 false；若需公開請搭配隧道、認證與速率限制。",
+      "usage_zh": "公開綁定有安全風險；僅在完成認證、網路邊界與監控配置後啟用。",
       "examples": [
         "[gateway] allow_public_bind = false"
       ],
@@ -370,7 +372,7 @@
     },
     "gateway.port": {
       "purpose_zh": "設定 gateway 監聽埠。",
-      "usage_zh": "確保埠未被占用，並與反向代理或 tunnel 設定一致。",
+      "usage_zh": "請確認埠不對外暴露於不受信任網段，並與反向代理安全策略一致。",
       "examples": [
         "[gateway] port = 3000"
       ],
@@ -381,7 +383,7 @@
     },
     "gateway.require_pairing": {
       "purpose_zh": "是否要求首次配對後才允許 Bearer 存取。",
-      "usage_zh": "建議保持 true，避免誤曝露。",
+      "usage_zh": "建議保持 true，以提高 gateway 存取安全門檻。",
       "examples": [
         "[gateway] require_pairing = true"
       ],
@@ -632,7 +634,7 @@
     },
     "security.estop.enabled": {
       "purpose_zh": "啟用緊急停止（e-stop）狀態機。",
-      "usage_zh": "當需要快速封鎖執行行為時啟用，並搭配 CLI 的 estop/resume 流程操作。",
+      "usage_zh": "建議在高風險環境啟用，作為安全緊急封鎖機制的一部分。",
       "examples": [
         "[security.estop] enabled = true"
       ],
